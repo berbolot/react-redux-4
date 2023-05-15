@@ -6,7 +6,6 @@ import {
 
 const fetchAllPosts = () => async (dispatch) => {
   dispatch(setLoading());
-
   try {
     const response = await fetch("http://localhost:4000/posts");
     const data = await response.json();

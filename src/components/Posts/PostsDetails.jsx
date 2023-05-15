@@ -1,25 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setLoadingPost,
+  setErrorPost,
+  setPost,
+} from "../../store/reducers/postDetSlice";
 
 const PostsDetails = () => {
   const navigate = useNavigate();
   const params = useParams();
   console.log(params);
+  const { loading, post, error } = useSelector((state) => state.postReducer);
 
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setLoading(true);
+    dispatch(setLoadingPost(true));
     fetch(`http://localhost:4000/posts/${params.id}`)
       .then((response) => response.json())
       .then((data) => {
-        setPost(data);
-        setError("");
+        dispatch(setPost(data));
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => dispatch(setErrorPost(err)))
+      .finally(() => {
+        dispatch(setLoadingPost(false));
+        console.log(loading);
+      });
   }, []);
 
   if (error) {
@@ -32,9 +39,12 @@ const PostsDetails = () => {
         "loading..."
       ) : (
         <div>
-          <button onClick={() => navigate( "/")}>Back</button>
-       <h1> {post.id} <br />  {post.title} <br /></h1>
-       <div> {post.body}</div>
+          <button onClick={() => navigate("/")}>Back</button>
+          <h1>
+            {" "}
+            {post.id} <br /> {post.title} <br />
+          </h1>
+          <div> {post.body}</div>
         </div>
       )}
     </div>
